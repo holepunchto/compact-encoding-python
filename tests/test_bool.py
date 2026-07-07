@@ -16,7 +16,7 @@ def test_bool_decode():
     assert cenc.decode(cenc.bool, b"\x00") is False
 
 
-def test_bool_decode_nonone_byte_is_false():
+def test_bool_decode_non_one_byte_is_false():
     assert cenc.decode(cenc.bool, b"\x02") is False
 
 

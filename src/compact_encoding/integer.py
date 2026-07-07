@@ -65,7 +65,7 @@ class _UInt:
 
 def _validate_uint32(n):
     if not (n >= 0):
-        raise ValueError("uint must be positive")
+        raise ValueError("uint32 must be positive")
     if n > 0xFFFFFFFF:
         raise ValueError("uint32 is out of range")
 

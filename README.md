@@ -1,6 +1,6 @@
 # compact-encoding-python
 
-Pure-Python port of [compact-encoding](https://github.com/compact-encoding/compact-encoding), wire-compatible with the JavaScript implementation. All multi-byte values are little-endian.
+Pure-Python port of [compact-encoding](https://github.com/holepunchto/compact-encoding), wire-compatible with the JavaScript implementation. All multi-byte values are little-endian.
 
 ## Usage
 

@@ -76,6 +76,13 @@ def test_uint32_rejects_out_of_range():
         cenc.encode(cenc.uint32, -1)
 
 
+def test_uint32_decode_truncated_raises():
+    from compact_encoding.codec import OutOfBounds
+
+    with pytest.raises(OutOfBounds):
+        cenc.decode(cenc.uint32, bytes.fromhex("010203"))  # only 3 of 4 bytes
+
+
 INT_CASES = [
     (0, "00"),
     (-1, "01"),
