@@ -74,3 +74,39 @@ def test_uint32_rejects_out_of_range():
         cenc.encode(cenc.uint32, 0x100000000)
     with pytest.raises(ValueError):
         cenc.encode(cenc.uint32, -1)
+
+
+INT_CASES = [
+    (0, "00"),
+    (-1, "01"),
+    (1, "02"),
+    (-2, "03"),
+    (2, "04"),
+    (63, "7e"),
+    (-64, "7f"),
+]
+
+
+@pytest.mark.parametrize("value,hexbytes", INT_CASES)
+def test_int_encode(value, hexbytes):
+    assert cenc.encode(cenc.int, value).hex() == hexbytes
+
+
+@pytest.mark.parametrize("value,hexbytes", INT_CASES)
+def test_int_decode(value, hexbytes):
+    assert cenc.decode(cenc.int, bytes.fromhex(hexbytes)) == value
+
+
+def test_int_max_positive_roundtrips():
+    assert cenc.decode(cenc.int, cenc.encode(cenc.int, 2**52 - 1)) == 2**52 - 1
+
+
+def test_int_min_negative_roundtrips():
+    assert cenc.decode(cenc.int, cenc.encode(cenc.int, -(2**52))) == -(2**52)
+
+
+def test_int_rejects_beyond_range():
+    with pytest.raises(ValueError):
+        cenc.encode(cenc.int, 2**52)  # zigzag -> 2**53 > MAX_SAFE
+    with pytest.raises(ValueError):
+        cenc.encode(cenc.int, -(2**52) - 1)

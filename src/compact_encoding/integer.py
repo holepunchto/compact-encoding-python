@@ -85,5 +85,31 @@ class _UInt32:
         return _read_le(state, 4)
 
 
+def _zigzag(n):
+    if n < 0:
+        return 2 * -n - 1
+    return 2 * n
+
+
+def _unzigzag(z):
+    if z == 0:
+        return 0
+    if z & 1 == 0:
+        return z // 2
+    return -(z + 1) // 2
+
+
+class _Int:
+    def preencode(self, state, n):
+        uint.preencode(state, _zigzag(n))
+
+    def encode(self, state, n):
+        uint.encode(state, _zigzag(n))
+
+    def decode(self, state):
+        return _unzigzag(uint.decode(state))
+
+
 uint = _UInt()
 uint32 = _UInt32()
+int_codec = _Int()
