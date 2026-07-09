@@ -28,6 +28,8 @@ ROUNDTRIP = [
     (cenc.float32, 0.5),
     (cenc.float32, -2.0),
     (cenc.float64, 3.141592653589793),
+    (cenc.fixed32, bytes(range(32))),
+    (cenc.fixed64, bytes(range(64))),
 ]
 
 

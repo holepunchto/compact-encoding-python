@@ -3,6 +3,7 @@
 from .bool import bool_codec as bool
 from .buffer import buffer
 from .codec import Codec, CompactError, OutOfBounds, decode, encode
+from .fixed import fixed, fixed32, fixed64
 from .float import float32, float64
 from .integer import (
     int24,
@@ -32,6 +33,9 @@ __all__ = [
     "buffer",
     "decode",
     "encode",
+    "fixed",
+    "fixed32",
+    "fixed64",
     "float32",
     "float64",
     "int",
