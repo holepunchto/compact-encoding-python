@@ -20,7 +20,7 @@ class _Float:
         if state.remaining < self._n:
             raise OutOfBounds("Out of bounds")
         s = state.start
-        value = struct.unpack(self._fmt, bytes(state.buffer[s : s + self._n]))[0]
+        value = struct.unpack(self._fmt, state.buffer[s : s + self._n])[0]
         state.start = s + self._n
         return value
 
