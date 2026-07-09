@@ -4,7 +4,7 @@ from .bool import bool_codec as bool
 from .buffer import buffer
 from .codec import Codec, CompactError, OutOfBounds, decode, encode
 from .integer import int_codec as int
-from .integer import uint, uint32
+from .integer import uint, uint8, uint16, uint24, uint32, uint40, uint48, uint56
 from .state import State
 from .string import utf8
 from .string import utf8 as string
@@ -21,6 +21,12 @@ __all__ = [
     "int",
     "string",
     "uint",
+    "uint8",
+    "uint16",
+    "uint24",
     "uint32",
+    "uint40",
+    "uint48",
+    "uint56",
     "utf8",
 ]

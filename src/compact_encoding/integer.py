@@ -85,6 +85,30 @@ class _UInt32:
         return _read_le(state, 4)
 
 
+class _SizedUInt:
+    def __init__(self, nbytes):
+        self._n = nbytes
+        self._bits = nbytes * 8
+
+    def _check(self, n):
+        _validate_uint(n)  # n >= 0 and n <= MAX_SAFE_INTEGER (JS validateUint)
+        if n >= (1 << self._bits):
+            raise ValueError(f"uint{self._bits} is out of range")
+
+    def preencode(self, state, n):
+        self._check(n)
+        state.end += self._n
+
+    def encode(self, state, n):
+        self._check(n)
+        s = state.start
+        state.buffer[s : s + self._n] = n.to_bytes(self._n, "little")
+        state.start = s + self._n
+
+    def decode(self, state):
+        return _read_le(state, self._n)
+
+
 def _zigzag(n):
     if n < 0:
         return 2 * -n - 1
@@ -113,3 +137,10 @@ class _Int:
 uint = _UInt()
 uint32 = _UInt32()
 int_codec = _Int()
+
+uint8 = _SizedUInt(1)
+uint16 = _SizedUInt(2)
+uint24 = _SizedUInt(3)
+uint40 = _SizedUInt(5)
+uint48 = _SizedUInt(6)
+uint56 = _SizedUInt(7)
