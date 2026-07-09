@@ -173,3 +173,52 @@ def test_sized_uint_decode_truncated_raises():
 
     with pytest.raises(OutOfBounds):
         cenc.decode(cenc.uint24, bytes.fromhex("0102"))  # 2 of 3 bytes
+
+
+SIZED_INT_CASES = [
+    ("int24", 0, "000000"),
+    ("int24", -1, "010000"),
+    ("int24", 1, "020000"),
+    ("int24", 8388607, "feffff"),  # 2**23 - 1
+    ("int24", -8388608, "ffffff"),  # -2**23
+    ("int40", -1, "0100000000"),
+    ("int40", 549755813887, "feffffffff"),  # 2**39 - 1
+    ("int40", -549755813888, "ffffffffff"),  # -2**39
+    ("int48", -1, "010000000000"),
+    ("int48", 140737488355327, "feffffffffff"),  # 2**47 - 1
+    ("int48", -140737488355328, "ffffffffffff"),  # -2**47
+    ("int56", -1, "01000000000000"),
+    ("int56", 4503599627370495, "feffffffffff1f"),  # 2**52 - 1 (fixture 42)
+    ("int56", -4503599627370496, "ffffffffffff1f"),  # -2**52 (fixture 42)
+]
+
+
+@pytest.mark.parametrize("name,value,hexbytes", SIZED_INT_CASES)
+def test_sized_int_encode(name, value, hexbytes):
+    assert cenc.encode(getattr(cenc, name), value).hex() == hexbytes
+
+
+@pytest.mark.parametrize("name,value,hexbytes", SIZED_INT_CASES)
+def test_sized_int_decode(name, value, hexbytes):
+    assert cenc.decode(getattr(cenc, name), bytes.fromhex(hexbytes)) == value
+
+
+@pytest.mark.parametrize(
+    "name,bad",
+    [
+        ("int24", 8388608),  # 2**23; zigzag -> 2**24, overflows uint24
+        ("int24", -8388609),  # -(2**23) - 1; zigzag overflows uint24
+        ("int56", 2**52),  # zigzag -> 2**53 > MAX_SAFE
+        ("int56", -(2**52) - 1),
+    ],
+)
+def test_sized_int_rejects_out_of_range(name, bad):
+    with pytest.raises(ValueError):
+        cenc.encode(getattr(cenc, name), bad)
+
+
+def test_sized_int_decode_truncated_raises():
+    from compact_encoding.codec import OutOfBounds
+
+    with pytest.raises(OutOfBounds):
+        cenc.decode(cenc.int40, bytes.fromhex("010203"))  # 3 of 5 bytes

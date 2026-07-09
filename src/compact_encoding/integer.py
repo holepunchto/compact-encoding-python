@@ -109,6 +109,20 @@ class _SizedUInt:
         return _read_le(state, self._n)
 
 
+class _SizedInt:
+    def __init__(self, uint_codec):
+        self._u = uint_codec
+
+    def preencode(self, state, n):
+        self._u.preencode(state, _zigzag(n))
+
+    def encode(self, state, n):
+        self._u.encode(state, _zigzag(n))
+
+    def decode(self, state):
+        return _unzigzag(self._u.decode(state))
+
+
 def _zigzag(n):
     if n < 0:
         return 2 * -n - 1
@@ -144,3 +158,8 @@ uint24 = _SizedUInt(3)
 uint40 = _SizedUInt(5)
 uint48 = _SizedUInt(6)
 uint56 = _SizedUInt(7)
+
+int24 = _SizedInt(uint24)
+int40 = _SizedInt(uint40)
+int48 = _SizedInt(uint48)
+int56 = _SizedInt(uint56)
