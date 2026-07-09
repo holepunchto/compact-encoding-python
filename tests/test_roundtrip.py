@@ -25,6 +25,9 @@ ROUNDTRIP = [
     (cenc.bool, True),
     (cenc.bool, False),
     (cenc.buffer, b"\x00\x01\x02\xfe\xff"),
+    (cenc.float32, 0.5),
+    (cenc.float32, -2.0),
+    (cenc.float64, 3.141592653589793),
 ]
 
 
