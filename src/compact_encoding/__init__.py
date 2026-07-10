@@ -5,6 +5,7 @@ from .buffer import buffer
 from .codec import Codec, CompactError, OutOfBounds, decode, encode
 from .fixed import fixed, fixed32, fixed64
 from .float import float32, float64
+from .frame import frame
 from .integer import (
     int24,
     int40,
@@ -39,6 +40,7 @@ __all__ = [
     "fixed64",
     "float32",
     "float64",
+    "frame",
     "int",
     "int24",
     "int40",
