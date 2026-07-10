@@ -33,6 +33,7 @@ ROUNDTRIP = [
     (cenc.json, {"a": [1, 2], "b": None}),
     (cenc.frame(cenc.uint), 42),
     (cenc.array(cenc.uint), [1, 2, 3]),
+    (cenc.record(cenc.string, cenc.uint), {"a": 1, "b": 2}),
 ]
 
 

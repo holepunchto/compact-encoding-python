@@ -23,6 +23,7 @@ from .integer import (
 )
 from .integer import int_codec as int
 from .json import json_codec as json
+from .record import record
 from .state import State
 from .string import utf8
 from .string import utf8 as string
@@ -49,6 +50,7 @@ __all__ = [
     "int48",
     "int56",
     "json",
+    "record",
     "string",
     "uint",
     "uint8",
