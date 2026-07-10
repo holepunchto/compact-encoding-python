@@ -31,6 +31,7 @@ ROUNDTRIP = [
     (cenc.fixed32, bytes(range(32))),
     (cenc.fixed64, bytes(range(64))),
     (cenc.json, {"a": [1, 2], "b": None}),
+    (cenc.frame(cenc.uint), 42),
 ]
 
 
