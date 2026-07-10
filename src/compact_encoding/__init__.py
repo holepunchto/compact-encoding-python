@@ -1,5 +1,6 @@
 """A small binary wire codec, wire-compatible with the JS reference."""
 
+from .array import array
 from .bool import bool_codec as bool
 from .buffer import buffer
 from .codec import Codec, CompactError, OutOfBounds, decode, encode
@@ -31,6 +32,7 @@ __all__ = [
     "CompactError",
     "OutOfBounds",
     "State",
+    "array",
     "bool",
     "buffer",
     "decode",
