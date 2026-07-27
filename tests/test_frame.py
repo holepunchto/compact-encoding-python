@@ -52,6 +52,20 @@ def test_frame_restores_cursor_for_following_field():
     assert cenc.uint.decode(verify) == 42
 
 
+def test_frame_decode_restores_end_on_inner_error():
+    # Inner uint over-reads past the frame boundary and raises; state.end must
+    # be restored to the outer end so the State is not left corrupted. Trailing
+    # bytes make the outer end (5) larger than the frame end (2), so a missing
+    # restore is observable.
+    from compact_encoding.state import State
+
+    state = State(bytes.fromhex("01fd000099"))
+    outer_end = state.end
+    with pytest.raises(OutOfBounds):
+        cenc.frame(cenc.uint).decode(state)
+    assert state.end == outer_end
+
+
 def test_frame_decode_truncated_raises():
     # Inner uint's continuation byte (0xfd) demands 2 more bytes that
     # aren't present; verified this also raises against the JS reference.
