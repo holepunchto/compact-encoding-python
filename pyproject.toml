@@ -10,10 +10,27 @@ readme = "README.md"
 license = "Apache-2.0"
 authors = [{ name = "Holepunch" }]
 requires-python = ">=3.10"
+keywords = ["compact-encoding", "codec", "binary", "serialization", "wire-format"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries",
+]
 dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.urls]
+Homepage = "https://github.com/holepunchto/compact-encoding-python"
+Repository = "https://github.com/holepunchto/compact-encoding-python"
+Issues = "https://github.com/holepunchto/compact-encoding-python/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/compact_encoding"]
