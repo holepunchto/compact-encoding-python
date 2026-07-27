@@ -18,12 +18,15 @@ class _Frame:
         self._codec.encode(state, m)
 
     def decode(self, state):
-        end = state.end
+        outer_end = state.end
         length = integer.uint.decode(state)
-        state.end = state.start + length
-        m = self._codec.decode(state)
-        state.start = state.end
-        state.end = end
+        frame_end = state.start + length
+        state.end = frame_end
+        try:
+            m = self._codec.decode(state)
+        finally:
+            state.end = outer_end
+        state.start = frame_end
         return m
 
 
