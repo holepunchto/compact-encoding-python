@@ -52,6 +52,18 @@ def test_uint_decode_empty_raises():
         cenc.decode(cenc.uint, b"")
 
 
+def test_uint_decode_beyond_max_safe_integer_raises():
+    # A full 8-byte varint payload holds far more than a JS Number, where the
+    # reference raises from validateSafeUint. Python ints would return it.
+    with pytest.raises(ValueError):
+        cenc.decode(cenc.uint, b"\xff" * 9)  # FF marker + 8 bytes of 0xff
+
+
+def test_uint_decode_max_safe_integer_is_allowed():
+    # The guard is off-by-none: the ceiling itself must still decode.
+    assert cenc.decode(cenc.uint, bytes.fromhex("ffffffffffffff1f00")) == MAX_SAFE
+
+
 UINT32_CASES = [
     (0, "00000000"),
     (1, "01000000"),
@@ -175,6 +187,29 @@ def test_sized_uint_decode_truncated_raises():
         cenc.decode(cenc.uint24, bytes.fromhex("0102"))  # 2 of 3 bytes
 
 
+def test_uint56_decode_beyond_max_safe_integer_raises():
+    with pytest.raises(ValueError):
+        cenc.decode(cenc.uint56, b"\xff" * 7)  # 2**56 - 1
+
+
+@pytest.mark.parametrize(
+    "name,nbytes,widest",
+    [
+        ("uint8", 1, 2**8 - 1),
+        ("uint16", 2, 2**16 - 1),
+        ("uint24", 3, 2**24 - 1),
+        ("uint40", 5, 2**40 - 1),
+        ("uint48", 6, 2**48 - 1),
+    ],
+)
+def test_narrow_sized_uint_decode_cannot_overflow(name, nbytes, widest):
+    # JS guards only uint56 and uint64 on decode because nothing narrower can
+    # exceed MAX_SAFE_INTEGER. Pin that reasoning so the guard is not "tidied"
+    # into the narrow codecs, or removed from the wide ones.
+    assert widest <= MAX_SAFE
+    assert cenc.decode(getattr(cenc, name), b"\xff" * nbytes) == widest
+
+
 SIZED_INT_CASES = [
     ("int24", 0, "000000"),
     ("int24", -1, "010000"),
@@ -222,3 +257,10 @@ def test_sized_int_decode_truncated_raises():
 
     with pytest.raises(OutOfBounds):
         cenc.decode(cenc.int40, bytes.fromhex("010203"))  # 3 of 5 bytes
+
+
+def test_sized_int_decode_beyond_max_safe_integer_raises():
+    # int56 wraps uint56, so it inherits the decode guard - matching JS, where
+    # int56 is zigZagInt(uint56) and the guard lives in uint56.decode.
+    with pytest.raises(ValueError):
+        cenc.decode(cenc.int56, b"\xff" * 7)

@@ -12,6 +12,16 @@ def _validate_uint(n):
         )
 
 
+def _validate_safe_uint(n):
+    # JS validateSafeUint: guards the decode side only, where a wide little-endian
+    # read can exceed what a JS Number holds. Python ints would return it happily.
+    if n > MAX_SAFE_INTEGER:
+        raise ValueError(
+            "uint is greater than the maximum safe integer, use biguint/bigint"
+        )
+    return n
+
+
 def _read_le(state, n):
     if state.remaining < n:
         raise OutOfBounds("Out of bounds")
@@ -60,7 +70,7 @@ class _UInt:
             return _read_le(state, 2)
         if a == 0xFE:
             return _read_le(state, 4)
-        return _read_le(state, 8)
+        return _validate_safe_uint(_read_le(state, 8))
 
 
 def _validate_uint32(n):
@@ -106,7 +116,7 @@ class _SizedUInt:
         state.start = s + self._n
 
     def decode(self, state):
-        return _read_le(state, self._n)
+        return _validate_safe_uint(_read_le(state, self._n))
 
 
 class _SizedInt:
