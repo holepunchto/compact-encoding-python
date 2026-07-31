@@ -1,0 +1,17 @@
+name: Publish
+on:
+  push:
+    tags:
+      - v*
+permissions:
+  id-token: write
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment:
+      name: pypi
+    name: Publish
+    steps:
+      - uses: holepunchto/actions/python-base@v1
+      - uses: holepunchto/actions/publish-pypi@v1
