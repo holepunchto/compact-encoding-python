@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "compact-encoding-python"
+name = "compact-encoding"
 version = "0.0.1"
 description = "Pure-Python port of the compact-encoding binary wire codec"
 readme = "README.md"
