@@ -131,6 +131,12 @@ def test_int_rejects_beyond_range():
         cenc.encode(cenc.int, -(2**52) - 1)
 
 
+def test_int_rejects_in_preencode():
+    with pytest.raises(ValueError):
+        state = cenc.state.State()
+        cenc.int.preencode(state, 2**52)  # zigzag -> 2**53 > MAX_SAFE
+
+
 SIZED_UINT_CASES = [
     ("uint8", 0, "00"),
     ("uint8", 1, "01"),
