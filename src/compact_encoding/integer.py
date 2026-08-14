@@ -1,14 +1,14 @@
 from .codec import OutOfBounds
 
 MAX_SAFE_INTEGER = 2**53 - 1
+MAX_SAFE_INT = 2**52 - 1
+MIN_SAFE_INT = -(2**52)
 
 
 def _validate_uint(n):
-    if not (n >= 0):
-        raise ValueError("uint must be positive")
-    if n > MAX_SAFE_INTEGER:
+    if n > MAX_SAFE_INTEGER or n < 0:
         raise ValueError(
-            "integer is greater than the maximum safe integer, use biguint/bigint"
+            f"uint must be between 0 and {MAX_SAFE_INTEGER}, use biguint/bigint"
         )
 
 
@@ -17,9 +17,16 @@ def _validate_safe_uint(n):
     # read can exceed what a JS Number holds. Python ints would return it happily.
     if n > MAX_SAFE_INTEGER:
         raise ValueError(
-            "uint is greater than the maximum safe integer, use biguint/bigint"
+            f"uint must be between 0 and {MAX_SAFE_INTEGER}, use biguint/bigint"
         )
     return n
+
+
+def _validate_int(n):
+    if n < MIN_SAFE_INT and n > MAX_SAFE_INT:
+        raise ValueError(
+            f"int must be between {MIN_SAFE_INT} and {MAX_SAFE_INT}, use bigint"
+        )
 
 
 def _read_le(state, n):
@@ -134,6 +141,7 @@ class _SizedInt:
 
 
 def _zigzag(n):
+    _validate_int(n)
     if n < 0:
         return 2 * -n - 1
     return 2 * n
