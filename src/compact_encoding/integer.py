@@ -1,6 +1,9 @@
 from .codec import OutOfBounds
 
 MAX_SAFE_INTEGER = 2**53 - 1
+# Zig-zag doubles the magnitude of a value before it is written as a uint, so an
+# int only reaches half as far as a uint of the same width does. So only applies
+# to signed ints.
 MAX_SAFE_INT = 2**52 - 1
 MIN_SAFE_INT = -(2**52)
 
