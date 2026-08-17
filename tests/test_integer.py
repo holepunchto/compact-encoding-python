@@ -132,8 +132,8 @@ def test_int_rejects_beyond_range():
 
 
 def test_int_rejects_in_preencode():
+    state = cenc.state.State()
     with pytest.raises(ValueError, match=r"^int must be between"):
-        state = cenc.state.State()
         cenc.int.preencode(state, 2**52)  # zigzag -> 2**53 > MAX_SAFE
 
 
