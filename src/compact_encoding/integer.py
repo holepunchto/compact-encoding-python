@@ -26,7 +26,7 @@ def _validate_safe_uint(n):
 
 
 def _validate_int(n):
-    if n < MIN_SAFE_INT and n > MAX_SAFE_INT:
+    if n < MIN_SAFE_INT or n > MAX_SAFE_INT:
         raise ValueError(
             f"int must be between {MIN_SAFE_INT} and {MAX_SAFE_INT}, use bigint"
         )
