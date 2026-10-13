@@ -29,5 +29,5 @@ jobs:
     steps:
       - uses: holepunchto/actions/python-base@v1
         with:
-          python-version: ${{ matrix.python-version }}
+          version: ${{ matrix.python-version }}
       - run: pytest
