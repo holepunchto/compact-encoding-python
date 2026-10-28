@@ -31,4 +31,5 @@ class _Frame:
 
 
 def frame(codec):
+    """A codec of ``codec`` values, prefixed with their encoded length."""
     return _Frame(codec)

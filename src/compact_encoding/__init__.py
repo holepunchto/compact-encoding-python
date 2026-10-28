@@ -1,4 +1,4 @@
-"""A small binary wire codec, wire-compatible with the JS reference."""
+"""Compact encoding schemes, wire compatible with compact-encoding."""
 
 from .array import array
 from .bool import bool_codec as bool

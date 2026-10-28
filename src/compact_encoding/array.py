@@ -24,4 +24,5 @@ class _Array:
 
 
 def array(codec):
+    """A codec of lists of ``codec`` values, prefixed with their length."""
     return _Array(codec)

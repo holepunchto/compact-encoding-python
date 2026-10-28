@@ -27,6 +27,7 @@ class _Fixed:
 
 
 def fixed(n):
+    """A codec of buffers of exactly ``n`` bytes, without a length prefix."""
     return _Fixed(n)
 
 

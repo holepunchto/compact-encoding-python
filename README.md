@@ -1,14 +1,12 @@
 # compact-encoding-python
 
-Pure-Python port of [compact-encoding](https://github.com/holepunchto/compact-encoding), wire-compatible with the JavaScript implementation. All multi-byte values are little-endian.
+Compact encoding schemes for Python. The Python counterpart of [compact-encoding](https://github.com/holepunchto/compact-encoding), and wire compatible with it. All multi-byte values are little-endian.
 
-The public surface is a deliberate subset of the JS reference - the codecs needed by [hyperschema-python](https://github.com/holepunchto/hyperschema-python) and [bare-rpc-python](https://github.com/holepunchto/bare-rpc-python). Additive JS codecs (e.g. `raw`, `any`, `bigint`, the IP codecs) are not ported; they can be added later without breaking the wire format.
-
-## Install
-
-```sh
-pip install git+https://github.com/holepunchto/compact-encoding-python
 ```
+pip install compact-encoding
+```
+
+Only the codecs needed by [hyperschema-python](https://github.com/holepunchto/hyperschema-python) and [bare-rpc-python](https://github.com/holepunchto/bare-rpc-python) are included so far. Others, such as `raw`, `any`, `bigint`, and the IP codecs, can be added without changing the wire format.
 
 ## Usage
 
