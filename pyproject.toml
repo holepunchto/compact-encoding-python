@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "compact-encoding"
-version = "0.0.1"
+version = "0.1.0"
 description = "Compact encoding schemes for Python"
 readme = "README.md"
 license = "Apache-2.0"
