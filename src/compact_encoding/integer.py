@@ -13,8 +13,8 @@ def _validate_uint(n):
 
 
 def _validate_safe_uint(n):
-    # JS validateSafeUint: guards the decode side only, where a wide little-endian
-    # read can exceed what a JS Number holds. Python ints would return it happily.
+    # Matches the JavaScript implementation, whose numbers can't hold every value
+    # of a wide read.
     if n > MAX_SAFE_INTEGER:
         raise ValueError(
             "uint is greater than the maximum safe integer, use biguint/bigint"
@@ -101,7 +101,7 @@ class _SizedUInt:
         self._bits = nbytes * 8
 
     def _check(self, n):
-        _validate_uint(n)  # n >= 0 and n <= MAX_SAFE_INTEGER (JS validateUint)
+        _validate_uint(n)
         if n >= (1 << self._bits):
             raise ValueError(f"uint{self._bits} is out of range")
 

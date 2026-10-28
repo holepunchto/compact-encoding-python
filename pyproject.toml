@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "compact-encoding"
 version = "0.0.1"
-description = "Pure-Python port of the compact-encoding binary wire codec"
+description = "Compact encoding schemes for Python"
 readme = "README.md"
 license = "Apache-2.0"
 authors = [{ name = "Holepunch" }]
@@ -25,7 +25,10 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = [
+  "pytest>=8",
+  "ruff>=0.6",
+]
 
 [project.urls]
 Homepage = "https://github.com/holepunchto/compact-encoding-python"
@@ -43,3 +46,7 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+  "error::ResourceWarning",
+  "error::pytest.PytestUnraisableExceptionWarning",
+]

@@ -28,4 +28,6 @@ class _Record:
 
 
 def record(key_codec, value_codec):
+    """A codec of dicts of ``key_codec`` keys and ``value_codec`` values,
+    prefixed with their length."""
     return _Record(key_codec, value_codec)
