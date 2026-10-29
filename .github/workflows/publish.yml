@@ -4,13 +4,11 @@ on:
     tags:
       - v*
 permissions:
-  contents: read
+  id-token: write
+  contents: write
 jobs:
   publish:
-    runs-on: ubuntu-24.04
-    permissions:
-      id-token: write
-      contents: write
+    runs-on: ubuntu-latest
     environment:
       name: pypi
     name: Publish
