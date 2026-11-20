@@ -1,0 +1,14 @@
+{
+  "name": "compact-encoding-python",
+  "private": true,
+  "description": "Dev-only manifest: resolves the conformance corpus",
+  "license": "Apache-2.0",
+  "author": "Holepunch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/compact-encoding-python.git"
+  },
+  "devDependencies": {
+    "compact-encoding-test": "^0.3.0"
+  }
+}
