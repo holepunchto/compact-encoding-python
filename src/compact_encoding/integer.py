@@ -1,35 +1,11 @@
 from .codec import OutOfBounds
 
-MAX_SAFE_INTEGER = 2**53 - 1
-# Zig-zag doubles the magnitude of a value before it is written as a uint, so an
-# int only reaches half as far as a uint of the same width does. So only applies
-# to signed ints.
-MAX_SAFE_INT = 2**52 - 1
-MIN_SAFE_INT = -(2**52)
+MAX_UINT = 2**64 - 1
 
 
 def _validate_uint(n):
-    if n > MAX_SAFE_INTEGER or n < 0:
-        raise ValueError(
-            f"uint must be between 0 and {MAX_SAFE_INTEGER}, use biguint/bigint"
-        )
-
-
-def _validate_safe_uint(n):
-    # Matches the JavaScript implementation, whose numbers can't hold every value
-    # of a wide read.
-    if n > MAX_SAFE_INTEGER:
-        raise ValueError(
-            f"uint must be between 0 and {MAX_SAFE_INTEGER}, use biguint/bigint"
-        )
-    return n
-
-
-def _validate_int(n):
-    if n < MIN_SAFE_INT or n > MAX_SAFE_INT:
-        raise ValueError(
-            f"int must be between {MIN_SAFE_INT} and {MAX_SAFE_INT}, use bigint"
-        )
+    if n < 0 or n > MAX_UINT:
+        raise ValueError(f"uint must be between 0 and {MAX_UINT}")
 
 
 def _read_le(state, n):
@@ -80,7 +56,7 @@ class _UInt:
             return _read_le(state, 2)
         if a == 0xFE:
             return _read_le(state, 4)
-        return _validate_safe_uint(_read_le(state, 8))
+        return _read_le(state, 8)
 
 
 def _validate_uint32(n):
@@ -126,7 +102,7 @@ class _SizedUInt:
         state.start = s + self._n
 
     def decode(self, state):
-        return _validate_safe_uint(_read_le(state, self._n))
+        return _read_le(state, self._n)
 
 
 class _SizedInt:
@@ -144,7 +120,6 @@ class _SizedInt:
 
 
 def _zigzag(n):
-    _validate_int(n)
     if n < 0:
         return 2 * -n - 1
     return 2 * n

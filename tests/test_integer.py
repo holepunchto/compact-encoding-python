@@ -33,9 +33,9 @@ def test_uint_rejects_negative():
         cenc.encode(cenc.uint, -1)
 
 
-def test_uint_rejects_beyond_max_safe_integer():
+def test_uint_rejects_beyond_its_widest_form():
     with pytest.raises(ValueError):
-        cenc.encode(cenc.uint, MAX_SAFE + 1)
+        cenc.encode(cenc.uint, 2**64)
 
 
 def test_uint_decode_truncated_varint_raises():
@@ -52,16 +52,9 @@ def test_uint_decode_empty_raises():
         cenc.decode(cenc.uint, b"")
 
 
-def test_uint_decode_beyond_max_safe_integer_raises():
-    # A full 8-byte varint payload holds far more than a JS Number, where the
-    # reference raises from validateSafeUint. Python ints would return it.
-    with pytest.raises(ValueError):
-        cenc.decode(cenc.uint, b"\xff" * 9)  # FF marker + 8 bytes of 0xff
-
-
-def test_uint_decode_max_safe_integer_is_allowed():
-    # The guard is off-by-none: the ceiling itself must still decode.
-    assert cenc.decode(cenc.uint, bytes.fromhex("ffffffffffffff1f00")) == MAX_SAFE
+def test_uint_decode_full_width_payload():
+    widest = cenc.decode(cenc.uint, b"\xff" * 9)  # FF marker + 8 bytes of 0xff
+    assert widest == 2**64 - 1
 
 
 UINT32_CASES = [
@@ -125,16 +118,16 @@ def test_int_min_negative_roundtrips():
 
 
 def test_int_rejects_beyond_range():
-    with pytest.raises(ValueError, match=r"^int must be between"):
-        cenc.encode(cenc.int, 2**52)  # zigzag -> 2**53 > MAX_SAFE
-    with pytest.raises(ValueError, match=r"^int must be between"):
-        cenc.encode(cenc.int, -(2**52) - 1)
+    with pytest.raises(ValueError, match=r"^uint must be between"):
+        cenc.encode(cenc.int, 2**63)  # zigzag -> 2**64, past the widest form
+    with pytest.raises(ValueError, match=r"^uint must be between"):
+        cenc.encode(cenc.int, -(2**63) - 1)
 
 
 def test_int_rejects_in_preencode():
     state = cenc.state.State()
-    with pytest.raises(ValueError, match=r"^int must be between"):
-        cenc.int.preencode(state, 2**52)  # zigzag -> 2**53 > MAX_SAFE
+    with pytest.raises(ValueError, match=r"^uint must be between"):
+        cenc.int.preencode(state, 2**63)
 
 
 SIZED_UINT_CASES = [
@@ -153,7 +146,7 @@ SIZED_UINT_CASES = [
     ("uint48", 4294967295, "ffffffff0000"),
     ("uint48", 281474976710655, "ffffffffffff"),
     ("uint56", 0, "00000000000000"),
-    ("uint56", MAX_SAFE, "ffffffffffff1f"),  # MAX_SAFE ceiling binds for uint56
+    ("uint56", 2**56 - 1, "ffffffffffffff"),
 ]
 
 
@@ -177,7 +170,7 @@ def test_sized_uint_decode(name, value, hexbytes):
         ("uint24", 16777216),
         ("uint40", 2**40),
         ("uint48", 2**48),
-        ("uint56", 2**53),  # exceeds MAX_SAFE_INTEGER
+        ("uint56", 2**56),
         ("uint8", -1),
     ],
 )
@@ -193,27 +186,8 @@ def test_sized_uint_decode_truncated_raises():
         cenc.decode(cenc.uint24, bytes.fromhex("0102"))  # 2 of 3 bytes
 
 
-def test_uint56_decode_beyond_max_safe_integer_raises():
-    with pytest.raises(ValueError):
-        cenc.decode(cenc.uint56, b"\xff" * 7)  # 2**56 - 1
-
-
-@pytest.mark.parametrize(
-    "name,nbytes,widest",
-    [
-        ("uint8", 1, 2**8 - 1),
-        ("uint16", 2, 2**16 - 1),
-        ("uint24", 3, 2**24 - 1),
-        ("uint40", 5, 2**40 - 1),
-        ("uint48", 6, 2**48 - 1),
-    ],
-)
-def test_narrow_sized_uint_decode_cannot_overflow(name, nbytes, widest):
-    # JS guards only uint56 and uint64 on decode because nothing narrower can
-    # exceed MAX_SAFE_INTEGER. Pin that reasoning so the guard is not "tidied"
-    # into the narrow codecs, or removed from the wide ones.
-    assert widest <= MAX_SAFE
-    assert cenc.decode(getattr(cenc, name), b"\xff" * nbytes) == widest
+def test_uint56_decode_full_width_payload():
+    assert cenc.decode(cenc.uint56, b"\xff" * 7) == 2**56 - 1
 
 
 SIZED_INT_CASES = [
@@ -249,8 +223,8 @@ def test_sized_int_decode(name, value, hexbytes):
     [
         ("int24", 8388608),  # 2**23; zigzag -> 2**24, overflows uint24
         ("int24", -8388609),  # -(2**23) - 1; zigzag overflows uint24
-        ("int56", 2**52),  # zigzag -> 2**53 > MAX_SAFE
-        ("int56", -(2**52) - 1),
+        ("int56", 2**55),  # zigzag -> 2**56, overflows uint56
+        ("int56", -(2**55) - 1),
     ],
 )
 def test_sized_int_rejects_out_of_range(name, bad):
@@ -265,8 +239,28 @@ def test_sized_int_decode_truncated_raises():
         cenc.decode(cenc.int40, bytes.fromhex("010203"))  # 3 of 5 bytes
 
 
-def test_sized_int_decode_beyond_max_safe_integer_raises():
-    # int56 wraps uint56, so it inherits the decode guard - matching JS, where
-    # int56 is zigZagInt(uint56) and the guard lives in uint56.decode.
-    with pytest.raises(ValueError):
-        cenc.decode(cenc.int56, b"\xff" * 7)
+def test_sized_int_decode_full_width_payload():
+    assert cenc.decode(cenc.int56, b"\xff" * 7) == -(2**55)
+
+
+@pytest.mark.parametrize(
+    "name,value,hexbytes",
+    [
+        ("int", 4503599627370496, "ff0000000000002000"),  # int-past-range
+        ("int", -4503599627370497, "ff0100000000002000"),  # int-past-range-min
+        ("uint", 2**63, "ff0000000000000080"),  # uint-uint64-top-byte
+    ],
+)
+def test_encodes_past_the_safe_integer_ceiling(name, value, hexbytes):
+    assert cenc.encode(getattr(cenc, name), value).hex() == hexbytes
+
+
+@pytest.mark.parametrize(
+    "name,hexbytes,value",
+    [
+        ("uint", "ff0000000000002000", 9007199254740992),  # uint-decode-ceiling
+        ("uint56", "00000000000020", 9007199254740992),  # uint56-decode-ceiling
+    ],
+)
+def test_decodes_past_the_safe_integer_ceiling(name, hexbytes, value):
+    assert cenc.decode(getattr(cenc, name), bytes.fromhex(hexbytes)) == value
