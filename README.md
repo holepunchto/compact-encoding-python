@@ -75,6 +75,18 @@ A `State` holds `start`, `end`, `buffer`, and a `remaining` property, plus `allo
 
 `CompactError` is the base error; `OutOfBounds` (a subclass) is raised when a decode reads past the end of the buffer. Out-of-range encodes raise `ValueError`.
 
+## Conformance
+
+`conformance.py` checks this port against [compact-encoding-test](https://github.com/holepunchto/compact-encoding-test), the cross-language corpus. The corpus arrives as an npm devDependency rather than vendored fixtures, so a case added upstream reaches the port through the pin it already has.
+
+```sh
+npm install        # resolves the corpus into node_modules
+python conformance.py
+python conformance.py --json   # the report shape CONFORMANCE.md specifies
+```
+
+It reports, per capability, the cases that matched, the cases that diverged, and whether this port provides the codec at all. `matched`, `diverged` and `unrun` partition the corpus: the cases of a codec this port does not provide are unrun rather than passing. A divergence is a finding against whichever side is wrong, the port or the corpus; the script exits zero either way.
+
 ## License
 
 Apache-2.0
