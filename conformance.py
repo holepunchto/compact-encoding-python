@@ -38,6 +38,8 @@ def value(category, given):
             return int(given[:-1])
         if given in TOKENS:
             return TOKENS[given]
+    if category == "floats" and isinstance(given, int):
+        return float(given)
     return given
 
 
