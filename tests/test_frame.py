@@ -71,3 +71,16 @@ def test_frame_decode_truncated_raises():
     # aren't present; verified this also raises against the JS reference.
     with pytest.raises(OutOfBounds):
         cenc.decode(cenc.frame(cenc.uint), bytes.fromhex("01fd"))
+
+
+def test_frame_decode_length_past_the_end_raises():
+    # A frame announcing more bytes than follow it is a rejection rather than
+    # the value inside it: 0501 announces five bytes with one behind it. The
+    # cursor must not be left past the buffer either, or a later read works
+    # from a position that does not exist.
+    from compact_encoding.state import State
+
+    state = State(bytes.fromhex("0501"))
+    with pytest.raises(OutOfBounds):
+        cenc.frame(cenc.uint).decode(state)
+    assert state.remaining >= 0

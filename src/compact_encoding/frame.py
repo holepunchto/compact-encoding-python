@@ -1,4 +1,5 @@
 from . import integer
+from .codec import OutOfBounds
 from .state import State
 
 
@@ -21,6 +22,8 @@ class _Frame:
         outer_end = state.end
         length = integer.uint.decode(state)
         frame_end = state.start + length
+        if frame_end > outer_end:
+            raise OutOfBounds("Out of bounds")
         state.end = frame_end
         try:
             m = self._codec.decode(state)
