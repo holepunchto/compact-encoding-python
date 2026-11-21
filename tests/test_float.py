@@ -34,3 +34,20 @@ def test_float_decode_truncated_raises():
         cenc.decode(cenc.float32, bytes.fromhex("010203"))  # 3 of 4
     with pytest.raises(OutOfBounds):
         cenc.decode(cenc.float64, bytes.fromhex("01020304050607"))  # 7 of 8
+
+
+def test_float32_overflows_to_an_infinity():
+    # A value the width cannot reach becomes an infinity rather than a refusal:
+    # a float codec refuses no number it is given.
+    assert cenc.encode(cenc.float32, 4e38).hex() == "0000807f"
+    assert cenc.encode(cenc.float32, 1e39).hex() == "0000807f"
+    assert cenc.encode(cenc.float32, -4e38).hex() == "000080ff"
+
+
+def test_float32_rounds_before_it_overflows():
+    # The rounding comes first, so a value above the largest binary32 holds is
+    # written as that largest one where it rounds down to it, and becomes an
+    # infinity only where it rounds past it. A codec comparing against the
+    # largest finite value before rounding answers an infinity for both.
+    assert cenc.encode(cenc.float32, 3.4028235e38).hex() == "ffff7f7f"
+    assert cenc.encode(cenc.float32, 3.4028236e38).hex() == "0000807f"

@@ -1,3 +1,4 @@
+import math
 import struct
 
 from .codec import OutOfBounds
@@ -13,8 +14,14 @@ class _Float:
 
     def encode(self, state, n):
         s = state.start
-        state.buffer[s : s + self._n] = struct.pack(self._fmt, n)
+        state.buffer[s : s + self._n] = self._pack(n)
         state.start = s + self._n
+
+    def _pack(self, n):
+        try:
+            return struct.pack(self._fmt, n)
+        except OverflowError:
+            return struct.pack(self._fmt, math.copysign(math.inf, n))
 
     def decode(self, state):
         if state.remaining < self._n:
