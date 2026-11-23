@@ -35,4 +35,5 @@ jobs:
     name: Test / ${{ matrix.platform }}
     steps:
       - uses: holepunchto/actions/python-base@v1
+      - run: npm install --ignore-scripts
       - run: pytest
