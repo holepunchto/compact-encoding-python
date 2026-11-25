@@ -27,13 +27,14 @@ Issues = "https://github.com/holepunchto/compact-encoding-python/issues"
 packages = ["src/compact_encoding"]
 
 [tool.ruff]
-src = ["src", "tests"]
+src = ["src", "tests", "."]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 filterwarnings = [
   "error::ResourceWarning",
   "error::pytest.PytestUnraisableExceptionWarning",

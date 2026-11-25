@@ -35,4 +35,6 @@ jobs:
     name: Test / ${{ matrix.platform }}
     steps:
       - uses: holepunchto/actions/python-base@v1
+      - uses: holepunchto/actions/setup-node@v1
+      - uses: holepunchto/actions/install-npm-dependencies@v1
       - run: pytest
